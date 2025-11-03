@@ -1,7 +1,6 @@
 const vendorService = require("../services/vendorService");
 const OpenAI = require("openai");
 const {
-  getRevenue,
   getShopRevenue,
   getShopRating,
   getShopProducts,
@@ -10,7 +9,6 @@ const {
   getOrdersWithFilter,
   updateSubordersStatusToProcessing,
   getShopAnalytics,
-  deleteSubordersByIds,
   getOrdersForExport,
   filterShopProducts,
 } = require("../services/vendorService");
@@ -70,19 +68,6 @@ const handleGetOrdersWithFilter = async (req, res) => {
       success: false,
       message: error.message || "Lỗi server khi lấy danh sách đơn hàng",
     });
-  }
-};
-
-// Lấy doanh thu tổng
-const handleGetRevenue = async (req, res) => {
-  try {
-    const userId = req.user.user_id;
-
-    const revenue = await getRevenue(userId);
-    res.json(revenue);
-  } catch (error) {
-    console.error("Error in handleGetRevenue:", error);
-    res.status(500).json({ message: error.message });
   }
 };
 
@@ -306,41 +291,6 @@ const handleUpdateSubordersStatusToProcessing = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error while updating suborder status.",
-    });
-  }
-};
-
-const handleDeleteSuborders = async (req, res) => {
-  try {
-    const { subOrderIds } = req.body; // Mong đợi mảng subOrderIds trong body
-
-    if (!Array.isArray(subOrderIds) || subOrderIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or empty subOrderIds list provided.",
-      });
-    }
-
-    const result = await deleteSubordersByIds(subOrderIds);
-
-    if (result.success) {
-      res.status(200).json({
-        success: true,
-        message: `Successfully deleted ${result.deletedCount} suborders.`,
-        deletedCount: result.deletedCount,
-      });
-    } else {
-      // Service returned false but didn't throw, likely no matching orders found
-      res.status(404).json({
-        success: false,
-        message: result.message || "No matching suborders found.",
-      });
-    }
-  } catch (error) {
-    console.error("Error in handleDeleteSuborders controller:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while deleting suborders.",
     });
   }
 };
@@ -698,15 +648,10 @@ const handleCreateProduct = async (req, res) => {
 const handleRegisterVendor = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const {
-      
-      shopName,
-      description,
-      address,
-    } = req.body;
+    const { shopName, description, address } = req.body;
 
     // Kiểm tra các trường bắt buộc
-    if (!shopName || !address ) {
+    if (!shopName || !address) {
       return res.status(400).json({
         success: false,
         message: "Vui lòng điền đầy đủ thông tin bắt buộc",
@@ -717,11 +662,9 @@ const handleRegisterVendor = async (req, res) => {
     const result = await vendorService.registerVendor(
       userId,
       {
-       
         shopName,
         description,
         address,
-        
       },
       req.uploadedImages
     );
@@ -739,11 +682,23 @@ const handleRegisterVendor = async (req, res) => {
     });
   }
 };
+// Hàm xử lí doanh thu các tháng theo năm
+const handleGetMonthlyRevenueByYear = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { year } = req.params;
+    const monthlyRevenue = await getShopRevenue(userId, year);
+    res.json(monthlyRevenue);
+  } catch (error) {
+    console.error("Error in handleGetMonthlyRevenue:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
+  handleGetMonthlyRevenueByYear,
   handleGetMyShop,
   handleGetAllOrders,
-  handleGetRevenue,
   handleGetShopAnalytics,
   handleUpdateShop,
   handleUpdateShopLogo,
@@ -755,7 +710,6 @@ module.exports = {
   handleProcessProduct,
   handleGetOrdersWithFilter,
   handleUpdateSubordersStatusToProcessing,
-  handleDeleteSuborders,
   handleExportOrders,
   handleGetSubordersWithOrderItemsPaginated,
   handleUpdateProduct,

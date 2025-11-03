@@ -1,23 +1,25 @@
-const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 /**
- * Hàm băm mật khẩu với SHA-256
+ * Hàm băm mật khẩu với bycrypt
  * @param {string} password - mật khẩu gốc
- * @returns {string} - chuỗi băm dạng hex
+ * @returns {Promise<string>} - chuỗi băm 
  */
-const hashPassword = (password) => {
-  return crypto.createHash("sha256").update(password).digest("hex");
+const hashPassword = async(password) => {
+  const saltRounds = 10;
+  const hashedPassword= await bcrypt.hash(password, saltRounds);
+  return hashedPassword;
 };
 
 /**
  * Hàm so sánh mật khẩu (dạng đơn giản - không có salt)
  * @param {string} password - mật khẩu người dùng nhập
  * @param {string} hashedPassword - mật khẩu đã băm lưu trong DB
- * @returns {boolean}
+ * @returns {Promise<boolean>} - kết quả so sánh
  */
-const comparePassword = (password, hashedPassword) => {
-  const hashedInput = hashPassword(password);
-  return hashedInput === hashedPassword;
+const comparePassword = async (password, hashedPassword) => {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
 };
 
 module.exports = {

@@ -17,6 +17,7 @@ const { sequelize } = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment-timezone");
 const Sequelize = require("sequelize");
+const { fn, col } = require("sequelize");
 
 // Lấy shop theo user ID
 const getShopByUserId = async (userId) => {
@@ -465,11 +466,11 @@ const getOrdersWithFilter = async (
       // Tính giá item nếu có đủ dữ liệu
       item_total_price:
         item.orderItems?.productVariant?.price != null &&
-          item.orderItems?.quantity != null &&
-          item.orderItems?.product?.discount != null
+        item.orderItems?.quantity != null &&
+        item.orderItems?.product?.discount != null
           ? parseFloat(item.orderItems.productVariant.price) *
-          parseInt(item.orderItems.quantity, 10) *
-          (1 - (parseFloat(item.orderItems.product.discount) || 0) / 100)
+            parseInt(item.orderItems.quantity, 10) *
+            (1 - (parseFloat(item.orderItems.product.discount) || 0) / 100)
           : 0, // Hoặc null, tùy logic
 
       // Truy cập dữ liệu từ Order
@@ -497,8 +498,8 @@ const getOrdersWithFilter = async (
       payment_method: item.Order?.payment_method || "cod",
       order_date: item.Order?.created_at
         ? moment(item.Order.created_at)
-          .tz("Asia/Ho_Chi_Minh")
-          .format("YYYY-MM-DD HH:mm:ss")
+            .tz("Asia/Ho_Chi_Minh")
+            .format("YYYY-MM-DD HH:mm:ss")
         : "", // Ngày tạo Order
       note: item.Order?.note || null,
     }));
@@ -532,69 +533,6 @@ const getOrdersWithFilter = async (
   }
 };
 
-// Lấy doanh thu tổng
-const getRevenue = async (userId) => {
-  try {
-    const shop = await Shop.findOne({
-      where: { owner_id: userId },
-      raw: true,
-    });
-
-    if (!shop) {
-      throw new Error("Không tìm thấy shop");
-    }
-
-    // Lấy tất cả đơn hàng của shop (cả đã giao và chưa giao)
-    const totalOrders = await SubOrder.count({
-      where: {
-        shop_id: shop.shop_id,
-      },
-    });
-
-    // Log tất cả các đơn hàng đã giao của shop
-    const allOrders = await SubOrder.findAll({
-      where: {
-        shop_id: shop.shop_id,
-        status: "delivered", // Chỉ lấy đơn hàng đã giao
-      },
-      attributes: [
-        "sub_order_id",
-        "order_id",
-        "shop_id",
-        "total_price",
-        "shipping_fee",
-        "status",
-        "created_at",
-        "updated_at",
-      ],
-    });
-
-    // Tính tổng giá trị đơn hàng (total_price + shipping_fee)
-    const totalValue = allOrders.reduce((sum, order) => {
-      const orderTotal = parseFloat(order.total_price) || 0;
-      // const shippingFee = parseFloat(order.shipping_fee) || 0;
-      return sum + orderTotal;
-    }, 0);
-
-    console.log("Total value (including shipping):", totalValue);
-
-    // Lấy số lượt xem shop
-    const shopViews = shop.views || 0;
-
-    const result = {
-      totalRevenue: totalValue,
-      totalOrders: totalOrders, // Tổng số đơn hàng
-      deliveredOrders: allOrders.length, // Số đơn hàng đã giao
-      views: shopViews,
-      deliveredOrdersList: allOrders,
-    };
-
-    return result;
-  } catch (error) {
-    console.error("Error in getRevenue:", error);
-    throw new Error("Không thể tính doanh thu");
-  }
-};
 
 // Lấy thống kê shop
 const getShopAnalytics = async (userId) => {
@@ -1077,9 +1015,9 @@ const getShopProducts = async (
           createdAt: product.reviews.created_at,
           user: product.reviews.user
             ? {
-              username: product.reviews.user.username,
-              profile_picture: product.reviews.user.profile_picture,
-            }
+                username: product.reviews.user.username,
+                profile_picture: product.reviews.user.profile_picture,
+              }
             : null,
           productId: productId,
           productName: product.product_name,
@@ -1105,9 +1043,9 @@ const getShopProducts = async (
           sold: product.sold,
           category: product.Category
             ? {
-              id: product.Category.category_id,
-              name: product.Category.category_name,
-            }
+                id: product.Category.category_id,
+                name: product.Category.category_name,
+              }
             : null,
           variants: [],
           images: {
@@ -1271,9 +1209,9 @@ const getShopProducts = async (
           sold: product.sold,
           category: product.Category
             ? {
-              id: product.Category.category_id,
-              name: product.Category.category_name,
-            }
+                id: product.Category.category_id,
+                name: product.Category.category_name,
+              }
             : null,
           variants: [],
           images: {
@@ -1427,10 +1365,10 @@ const updateOrderStatus = async (userId, subOrderId, newStatus) => {
       "Found product:",
       product
         ? {
-          product_id: product.product_id,
-          shop_id: product.shop_id,
-          status: product.status,
-        }
+            product_id: product.product_id,
+            shop_id: product.shop_id,
+            status: product.status,
+          }
         : null
     );
 
@@ -1447,9 +1385,9 @@ const updateOrderStatus = async (userId, subOrderId, newStatus) => {
       "Found shop:",
       shop
         ? {
-          shop_id: shop.shop_id,
-          owner_id: shop.owner_id,
-        }
+            shop_id: shop.shop_id,
+            owner_id: shop.owner_id,
+          }
         : null
     );
 
@@ -1531,10 +1469,10 @@ const processProduct = async (userId, productId) => {
       "Found product:",
       product
         ? {
-          product_id: product.product_id,
-          shop_id: product.shop_id,
-          status: product.status,
-        }
+            product_id: product.product_id,
+            shop_id: product.shop_id,
+            status: product.status,
+          }
         : null
     );
 
@@ -1551,9 +1489,9 @@ const processProduct = async (userId, productId) => {
       "Found shop:",
       shop
         ? {
-          shop_id: shop.shop_id,
-          owner_id: shop.owner_id,
-        }
+            shop_id: shop.shop_id,
+            owner_id: shop.owner_id,
+          }
         : null
     );
 
@@ -1659,8 +1597,9 @@ const updateSubordersStatusToProcessing = async (subOrderIds) => {
         if (variant.stock < orderItem.quantity) {
           return {
             success: false,
-            message: `Không đủ hàng cho sản phẩm ${orderItem.product_name} (${variant.color || ""
-              } ${variant.size || ""})`,
+            message: `Không đủ hàng cho sản phẩm ${orderItem.product_name} (${
+              variant.color || ""
+            } ${variant.size || ""})`,
           };
         }
       }
@@ -1720,36 +1659,6 @@ const updateSubordersStatusToProcessing = async (subOrderIds) => {
   } catch (error) {
     console.error("Error in updateSubordersStatusToProcessing service:", error);
     throw new Error("Failed to update suborder status and stock");
-  }
-};
-
-// Service function to delete multiple suborders by their IDs
-const deleteSubordersByIds = async (subOrderIds) => {
-  try {
-    if (!Array.isArray(subOrderIds) || subOrderIds.length === 0) {
-      console.warn(
-        "Invalid or empty subOrderIds array provided to deleteSubordersByIds"
-      );
-      return { success: false, message: "Invalid or empty subOrderIds list" };
-    }
-
-    // Delete SubOrders where the sub_order_id is in the provided list
-    const deletedRowsCount = await SubOrder.destroy({
-      where: {
-        sub_order_id: subOrderIds,
-      },
-    });
-
-    if (deletedRowsCount > 0) {
-      console.log(`Successfully deleted ${deletedRowsCount} suborders.`);
-      return { success: true, deletedCount: deletedRowsCount };
-    } else {
-      console.warn(`No suborders found with provided IDs to delete.`);
-      return { success: false, message: "No matching suborders found" };
-    }
-  } catch (error) {
-    console.error("Error in deleteSubordersByIds service:", error);
-    throw new Error("Failed to delete suborders");
   }
 };
 
@@ -2535,11 +2444,76 @@ const registerVendor = async (userId, shopData, uploadedImages) => {
   }
 };
 
+// Lấy doanh thu các tháng theo năm
+const getShopRevenue = async (userId, year) => {
+  try {
+    // Tìm shop thuộc user
+    const shop = await Shop.findOne({ where: { owner_id: userId } });
+    if (!shop) {
+      throw new Error("Không tìm thấy thông tin shop");
+    }
+
+    // Xác định khoảng thời gian đầu và cuối năm
+    const startDate = new Date(`${year}-01-01T00:00:00.000Z`);
+    const endDate = new Date(`${year}-12-31T23:59:59.999Z`);
+
+    // Lấy danh sách SubOrder theo shop và năm, kèm Order (chỉ các đơn đã thanh toán)
+    const revenueData = await SubOrder.findAll({
+      where: { shop_id: shop.shop_id },
+      include: [
+        {
+          model: Order,
+          as: "Order",
+          where: {
+            payment_status: "paid",
+            created_at: { [Op.between]: [startDate, endDate] },
+          },
+          attributes: [], // Không cần lấy cột trong Order để nhẹ dữ liệu
+        },
+      ],
+      attributes: [
+        [fn("MONTH", col("Order.created_at")), "month"],
+        [
+          fn("COALESCE", fn("SUM", col("SubOrder.total_price")), 0),
+          "total_revenue",
+        ],
+      ],
+      group: [fn("MONTH", col("Order.created_at"))],
+      order: [[fn("MONTH", col("Order.created_at")), "ASC"]],
+      raw: true,
+    });
+
+    // Khởi tạo mảng doanh thu 12 tháng
+    const monthlyRevenue = Array(12).fill(0);
+
+    // Gán dữ liệu cho từng tháng có doanh thu
+    revenueData.forEach((data) => {
+      const monthIndex = parseInt(data.month) - 1; // từ 1-12 → 0-11
+      monthlyRevenue[monthIndex] = parseFloat(data.total_revenue);
+    });
+
+    return {
+      success: true,
+      data: {
+        year,
+        revenue: monthlyRevenue,
+      },
+      message: "Lấy doanh thu thành công",
+    };
+  } catch (error) {
+    console.error("Error in getShopRevenue:", error);
+    return {
+      success: false,
+      message: error.message || "Có lỗi xảy ra khi lấy doanh thu",
+    };
+  }
+};
+
 module.exports = {
+  getShopRevenue,
   getShopByUserId,
   getAllOrders,
   getOrdersWithFilter,
-  getRevenue,
   getShopAnalytics,
   updateShop,
   updateShopLogo,
@@ -2551,7 +2525,6 @@ module.exports = {
   updateOrderStatus,
   processProduct,
   updateSubordersStatusToProcessing,
-  deleteSubordersByIds,
   getOrdersForExport,
   getSubordersWithOrderItemsPaginated,
   updateProduct,
