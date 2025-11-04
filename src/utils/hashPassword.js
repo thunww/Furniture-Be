@@ -1,25 +1,44 @@
 const bcrypt = require("bcrypt");
 
 /**
- * Hàm băm mật khẩu với bycrypt
- * @param {string} password - mật khẩu gốc
- * @returns {Promise<string>} - chuỗi băm 
+ * Băm mật khẩu an toàn bằng bcrypt
+ * @param {string} password - Mật khẩu gốc của người dùng
+ * @returns {Promise<string>} - Mật khẩu đã được băm (hash)
  */
-const hashPassword = async(password) => {
-  const saltRounds = 10;
-  const hashedPassword= await bcrypt.hash(password, saltRounds);
-  return hashedPassword;
+const hashPassword = async (password) => {
+  if (!password || typeof password !== "string") {
+    throw new Error("Invalid password input for hashing");
+  }
+
+  try {
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+  } catch (error) {
+    console.error("Error hashing password:", error.message);
+    throw new Error("Password hashing failed");
+  }
 };
 
 /**
- * Hàm so sánh mật khẩu (dạng đơn giản - không có salt)
- * @param {string} password - mật khẩu người dùng nhập
- * @param {string} hashedPassword - mật khẩu đã băm lưu trong DB
- * @returns {Promise<boolean>} - kết quả so sánh
+ * So sánh mật khẩu người dùng nhập với mật khẩu đã băm trong DB
+ * @param {string} password - Mật khẩu người dùng nhập
+ * @param {string} hashedPassword - Mật khẩu đã băm trong cơ sở dữ liệu
+ * @returns {Promise<boolean>} - true nếu khớp, false nếu sai
  */
 const comparePassword = async (password, hashedPassword) => {
-  const isMatch = await bcrypt.compare(password, hashedPassword);
-  return isMatch;
+  if (!password || !hashedPassword) {
+    throw new Error("Missing password or hash for comparison");
+  }
+
+  try {
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    return isMatch;
+  } catch (error) {
+    console.error("Error comparing password:", error.message);
+    throw new Error("Password comparison failed");
+  }
 };
 
 module.exports = {
