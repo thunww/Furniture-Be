@@ -55,7 +55,7 @@ const loginUser = async (email, password) => {
     throw new Error("Email does not exist!");
   }
 
-  const isMatch = comparePassword(password, user.password);
+  const isMatch = await comparePassword(password, user.password);
   if (!isMatch) {
     throw new Error("Incorrect password!");
   }
@@ -124,7 +124,7 @@ const resetPassword = async (token, newPassword) => {
     throw new Error("User not found");
   }
 
-  const hashedPassword = hashPassword(newPassword);
+  const hashedPassword = await hashPassword(newPassword);
   user.password = hashedPassword;
   await user.save();
 

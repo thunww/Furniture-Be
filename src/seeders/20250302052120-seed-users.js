@@ -1,13 +1,10 @@
-const crypto = require("crypto");
-
-function hashSHA256(password) {
-  return crypto.createHash("sha256").update(password).digest("hex");
-}
+const bcrypt = require("bcrypt");
 
 module.exports = {
   up: async (queryInterface) => {
-    const hashedPassword = hashSHA256("password123");
-    const adminPassword = hashSHA256("admin");
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash("password123", saltRounds);
+    const adminPassword = await bcrypt.hash("admin", saltRounds);
     await queryInterface.bulkInsert("Users", [
       {
         user_id: 1,
