@@ -14,8 +14,6 @@ const {
 const { handleFilterShopProducts } = require("../controllers/vendorController");
 const { upload } = require("../middleware/uploadMiddleware");
 
-
-
 // Middleware cho vendor routes
 const vendorMiddleware = [authMiddleware, roleMiddleware(["vendor"], true)];
 // Route đăng ký trở thành vendor (chỉ cần auth, không cần role)
@@ -34,18 +32,16 @@ router.get(
   categoryController.getAllCategories
 );
 
-// Lấy doanh thu tổng
-router.get("/revenue", vendorMiddleware, vendorController.handleGetRevenue);
 
 // Lấy danh sách đơn hàng
 router.get("/orders", vendorMiddleware, vendorController.handleGetAllOrders);
-// Lấy danh sách đơn hàng với phân trang và filter
+// // Lấy danh sách đơn hàng với phân trang và filter
 router.get(
   "/orders",
   vendorMiddleware,
   vendorController.handleGetOrdersWithFilter
 );
-// Route lấy danh sách đơn hàng với phân trang
+// // // Route lấy danh sách đơn hàng với phân trang
 router.get(
   "/ordersPage",
   vendorMiddleware,
@@ -57,13 +53,6 @@ router.put(
   "/orders/bulk-status",
   vendorMiddleware,
   vendorController.handleUpdateSubordersStatusToProcessing
-);
-
-// Route to delete multiple suborders by their IDs
-router.delete(
-  "/orders/bulk-delete",
-  vendorMiddleware,
-  vendorController.handleDeleteSuborders
 );
 
 // Route để xuất dữ liệu đơn hàng
@@ -174,4 +163,10 @@ router.post(
   handleProductError
 );
 
+// Route để lấy doanh thu các tháng theo năm
+router.get(
+  "/revenue/:year",
+  vendorMiddleware,
+  vendorController.handleGetMonthlyRevenueByYear
+);
 module.exports = router;

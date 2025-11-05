@@ -2,16 +2,17 @@
   "development": {
     "username": "root",
     "password": "root",
-    "database": "DBWeb",
-    "host": "",
+    "database": "WebFurniture",
+    "host": "localhost",
+    "port": 3306,
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": "LmUEXdlVFmmZGbCZokpCjGGTReZqtZTw",
-    "database": "railway",
-    "host": "tramway.proxy.rlwy.net",
-    "port": 55930,
+    "password": "root",
+    "database": "WebFurniture",
+    "host": "mysql",
+    "port": 3306,
     "dialect": "mysql"
   }
 }

@@ -15,9 +15,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
+COPY .env.docker .env
+
 # Create uploads directory
 RUN mkdir -p uploads
+ENV DB_HOST=mysql
 
-EXPOSE 3000
 
 CMD ["npm", "start"] 
