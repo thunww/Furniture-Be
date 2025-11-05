@@ -51,66 +51,147 @@ const registerUser = async (username, email, password) => {
 
 const loginUser = async (email, password, rememberMe = false) => {
   const user = await User.findOne({ where: { email } });
-
-  // Luôn trả lỗi chung nếu email không tồn tại hoặc mật khẩu sai
-  if (!user) throw new Error("Email hoặc mật khẩu không chính xác");
+  if (!user) {
+    throw new Error("Email does not exist!");
+  }
 
   const isMatch = await comparePassword(password, user.password);
-  if (!isMatch) throw new Error("Email hoặc mật khẩu không chính xác");
+  if (!isMatch) {
+    throw new Error("Incorrect password!");
+  }
 
-  // Cấm login nếu bị khóa hoặc chưa xác minh
-  if (user.status === "banned") throw new Error("Tài khoản đã bị khóa");
-  if (!user.is_verified)
-    throw new Error("Vui lòng xác minh email trước khi đăng nhập");
+  if (user.status === "banned") {
+    throw new Error("User account banned");
+  }
 
-  // Lấy roles
+  if (!user.is_verified) {
+    throw new Error("Please verify your email first!");
+  }
+
   const userRoles = await UserRole.findAll({
     where: { user_id: user.user_id },
   });
+
+  if (userRoles.length === 0) {
+    throw new Error("User has no assigned role!");
+  }
+
   const roleIds = userRoles.map((ur) => ur.role_id);
   const roles = await Role.findAll({ where: { role_id: roleIds } });
-  const roleNames = roles.map((r) => r.role_name);
+  const roleNames = roles.map((role) => role.role_name);
 
-  // Tạo Access Token (2h)
+  // Tạo access token (thời gian ngắn)
+  const accessTokenExpiry = rememberMe ? "7d" : "2h";
   const accessToken = generateToken(
-    { user_id: user.user_id, email: user.email, roles: roleNames },
-    "2h"
+    {
+      user_id: user.user_id,
+      email: user.email,
+      roles: roleNames,
+    },
+    accessTokenExpiry
   );
 
-  // Tạo Refresh Token (7 hoặc 30 ngày)
-  const refreshExpiresIn = rememberMe ? "30d" : "7d";
+  // Tạo refresh token (thời gian dài hơn)
+  const refreshTokenExpiry = rememberMe ? "30d" : "7d";
   const refreshToken = generateToken(
-    { user_id: user.user_id, email: user.email },
-    refreshExpiresIn
+    {
+      user_id: user.user_id,
+      type: "refresh",
+    },
+    refreshTokenExpiry
   );
+
+  // Lưu refresh token vào database
+  await user.update({
+    refresh_token: refreshToken,
+  });
 
   return {
-    message: "Đăng nhập thành công",
+    message: "Login successful",
     accessToken,
     refreshToken,
     user: {
       user_id: user.user_id,
       email: user.email,
+      username: user.username,
+      roles: roleNames,
+      status: user.status,
+    },
+  };
+};
+
+// Service để refresh access token
+const refreshAccessToken = async (refreshToken) => {
+  if (!refreshToken) {
+    throw new Error("Refresh token is required");
+  }
+
+  // Verify refresh token
+  const decoded = verifyToken(refreshToken);
+  if (!decoded || decoded.type !== "refresh") {
+    throw new Error("Invalid refresh token");
+  }
+
+  // Tìm user và kiểm tra refresh token trong DB
+  const user = await User.findOne({
+    where: {
+      user_id: decoded.user_id,
+      refresh_token: refreshToken,
+    },
+  });
+
+  if (!user) {
+    throw new Error("Invalid refresh token or user not found");
+  }
+
+  if (user.status === "banned") {
+    throw new Error("User account banned");
+  }
+
+  // Lấy roles của user
+  const userRoles = await UserRole.findAll({
+    where: { user_id: user.user_id },
+  });
+
+  const roleIds = userRoles.map((ur) => ur.role_id);
+  const roles = await Role.findAll({ where: { role_id: roleIds } });
+  const roleNames = roles.map((role) => role.role_name);
+
+  // Tạo access token mới
+  const newAccessToken = generateToken(
+    {
+      user_id: user.user_id,
+      email: user.email,
+      roles: roleNames,
+    },
+    "2h"
+  );
+
+  return {
+    accessToken: newAccessToken,
+    user: {
+      user_id: user.user_id,
+      email: user.email,
+      username: user.username,
       roles: roleNames,
     },
   };
 };
 
-// ✅ Làm mới token
-const refreshAccessToken = async (refreshToken) => {
-  const decoded = verifyToken(refreshToken);
-  if (!decoded) throw new Error("Invalid or expired refresh token");
+// Service để logout (xóa refresh token)
+const logoutUser = async (userId) => {
+  const user = await User.findOne({ where: { user_id: userId } });
 
-  // Tạo token mới
-  const newAccessToken = generateToken(
-    {
-      user_id: decoded.user_id,
-      email: decoded.email,
-    },
-    "2h"
-  );
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-  return newAccessToken;
+  // Xóa refresh token khỏi database
+  await user.update({
+    refresh_token: null,
+  });
+
+  return { message: "Logout successful" };
 };
 
 const forgotPassword = async (email) => {
@@ -120,7 +201,6 @@ const forgotPassword = async (email) => {
   }
 
   const resetToken = generateToken({ userId: user.user_id }, "1h");
-
   await sendResetPasswordEmail(email, resetToken);
 
   return { message: "Password reset email has been sent" };
@@ -139,7 +219,7 @@ const resetPassword = async (token, newPassword) => {
     throw new Error("User not found");
   }
 
-  const hashedPassword = hashPassword(newPassword);
+  const hashedPassword = await hashPassword(newPassword);
   user.password = hashedPassword;
   await user.save();
 
@@ -149,7 +229,8 @@ const resetPassword = async (token, newPassword) => {
 module.exports = {
   registerUser,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
   forgotPassword,
   resetPassword,
-  refreshAccessToken,
 };

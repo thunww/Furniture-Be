@@ -1,27 +1,27 @@
 const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
 const {
-  handleLoginUser,
   handleregisterUser,
+  handleLoginUser,
+  handleRefreshToken,
   verifyEmail,
   handleForgotPassword,
   handleResetPassword,
   handleLogout,
-  handleRefreshToken,
-  handleGetProfile,
 } = require("../controllers/authController");
 
-const router = express.Router();
-
-// ---------- ROUTES ----------
+// Public routes
 router.post("/register", handleregisterUser);
 router.post("/login", handleLoginUser);
 router.get("/verify-email", verifyEmail);
 router.post("/forgot-password", handleForgotPassword);
 router.post("/reset-password", handleResetPassword);
-router.post("/logout", handleLogout);
 
-// ✅ Thêm route refresh token
-router.post("/refresh", handleRefreshToken);
-router.get("/profile", handleGetProfile);
+// Route để refresh token (không cần authMiddleware)
+router.post("/refresh-token", handleRefreshToken);
+
+// Protected routes
+router.post("/logout", authMiddleware, handleLogout);
 
 module.exports = router;

@@ -18,6 +18,9 @@ module.exports = {
         profile_picture:
           "https://scr.vn/wp-content/uploads/2020/08/Nh%C3%B3c-Maruko-d%E1%BB%85-th%C6%B0%C6%A1ng-1024x1024.jpeg",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 2,
@@ -33,6 +36,9 @@ module.exports = {
         profile_picture:
           "https://th.bing.com/th/id/OIP.pqzQpx8Wg5fEHznAKKY6ugHaJ4?rs=1&pid=ImgDetMain",
         is_verified: false,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 3,
@@ -48,6 +54,9 @@ module.exports = {
         profile_picture:
           "https://scr.vn/wp-content/uploads/2020/08/Nh%C3%B3c-Maruko-d%E1%BB%85-th%C6%B0%C6%A1ng-1024x1024.jpeg",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 4,
@@ -63,6 +72,9 @@ module.exports = {
         profile_picture:
           "https://i.pinimg.com/736x/15/be/db/15bedb1b6c809f4d39a3de30284f76b8.jpg",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 5,
@@ -78,6 +90,9 @@ module.exports = {
         profile_picture:
           "https://th.bing.com/th/id/OIP.SCjSV9ROgJ9zY0lNz2-7nAAAAA?rs=1&pid=ImgDetMain",
         is_verified: false,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 6,
@@ -93,6 +108,9 @@ module.exports = {
         profile_picture:
           "https://i.pinimg.com/originals/09/eb/05/09eb054f98331e1377f3d3639e6827c6.jpg",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 7,
@@ -108,6 +126,9 @@ module.exports = {
         profile_picture:
           "https://th.bing.com/th/id/R.59bd7bcd8ec78ce8399f03a32f587ce3?rik=I4aCO%2fZGFu4EpQ&pid=ImgRaw&r=0",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 8,
@@ -123,6 +144,9 @@ module.exports = {
         profile_picture:
           "https://st.quantrimang.com/photos/image/2021/08/16/Anh-vit-cute-6.jpg",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 9,
@@ -137,6 +161,9 @@ module.exports = {
         date_of_birth: "1991-06-30",
         profile_picture: null,
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 10,
@@ -151,6 +178,9 @@ module.exports = {
         date_of_birth: "1994-12-15",
         profile_picture: null,
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 11,
@@ -166,6 +196,9 @@ module.exports = {
         profile_picture:
           "https://th.bing.com/th/id/OIP.SekLpJoq-MMycqBj2zmAgAHaHa?rs=1&pid=ImgDetMain",
         is_verified: false,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 12,
@@ -181,6 +214,9 @@ module.exports = {
         profile_picture:
           "https://th.bing.com/th/id/OIP.vI19rIQCot6S1udZluDtCQHaEx?rs=1&pid=ImgDetMain",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 13,
@@ -196,6 +232,9 @@ module.exports = {
         profile_picture:
           "https://vnn-imgs-f.vgcloud.vn/2020/04/25/15/ronaldo.jpg",
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 14,
@@ -210,6 +249,9 @@ module.exports = {
         date_of_birth: "1992-05-05",
         profile_picture: null,
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 15,
@@ -224,6 +266,9 @@ module.exports = {
         date_of_birth: "1998-08-08",
         profile_picture: null,
         is_verified: false,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 16,
@@ -238,6 +283,9 @@ module.exports = {
         date_of_birth: "1993-09-09",
         profile_picture: null,
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 17,
@@ -252,6 +300,9 @@ module.exports = {
         date_of_birth: "1991-07-07",
         profile_picture: null,
         is_verified: false,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         user_id: 18,
@@ -266,6 +317,9 @@ module.exports = {
         date_of_birth: "1990-06-06",
         profile_picture: null,
         is_verified: true,
+        refresh_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ];
 
