@@ -646,7 +646,12 @@ const handleCreateProduct = async (req, res) => {
 const handleRegisterVendor = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { shopName, description, address } = req.body;
+    const {
+
+      shopName,
+      description,
+      address,
+    } = req.body;
 
     // Kiểm tra các trường bắt buộc
     if (!shopName || !address) {
@@ -660,9 +665,11 @@ const handleRegisterVendor = async (req, res) => {
     const result = await vendorService.registerVendor(
       userId,
       {
+
         shopName,
         description,
         address,
+
       },
       req.uploadedImages
     );
