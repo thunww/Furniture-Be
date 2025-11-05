@@ -336,7 +336,8 @@ const handleExportOrders = async (req, res) => {
         "Tên sản phẩm": order.orderItems
           .map(
             (item) =>
-              `${item.product_name} (${item.quantity}x)${item.size ? ` - ${item.size}` : ""
+              `${item.product_name} (${item.quantity}x)${
+                item.size ? ` - ${item.size}` : ""
               }${item.color ? ` - ${item.color}` : ""}`
           )
           .join("\n"),
@@ -347,8 +348,9 @@ const handleExportOrders = async (req, res) => {
           order.orderItems[0]?.discount || 0
         ).toLocaleString("vi-VN")}%`,
         "Thành tiền": `${itemTotal[0].toLocaleString("vi-VN")}đ`,
-        "Khách hàng": `${order.customer?.username || ""} (${order.customer?.phone || ""
-          })`,
+        "Khách hàng": `${order.customer?.username || ""} (${
+          order.customer?.phone || ""
+        })`,
         Email: order.customer?.email || "",
         "Người nhận": order.shipping_address?.recipient_name || "",
         "SĐT người nhận": order.shipping_address?.phone || "",
@@ -647,14 +649,14 @@ const handleRegisterVendor = async (req, res) => {
   try {
     const userId = req.user.user_id;
     const {
-
+      
       shopName,
       description,
       address,
     } = req.body;
 
     // Kiểm tra các trường bắt buộc
-    if (!shopName || !address) {
+    if (!shopName || !address ) {
       return res.status(400).json({
         success: false,
         message: "Vui lòng điền đầy đủ thông tin bắt buộc",
@@ -665,11 +667,11 @@ const handleRegisterVendor = async (req, res) => {
     const result = await vendorService.registerVendor(
       userId,
       {
-
+       
         shopName,
         description,
         address,
-
+        
       },
       req.uploadedImages
     );
