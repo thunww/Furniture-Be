@@ -281,6 +281,7 @@ const getProductDetails = async (req, res) => {
 const searchProducts = async (req, res) => {
   try {
     const {
+
       q = "",
       category_id,
       min_price: minPriceRaw = "0",
