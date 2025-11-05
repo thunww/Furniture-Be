@@ -1,166 +1,183 @@
-"use strict";
-
-/**
- * Seeder: Shops (phiên bản Furniture-only)
- * - Tự động tìm user_id của các user có role 'vendor' để gán owner_id
- * - Tránh lỗi FK khi DB được migrate/seed lại và user_id thay đổi
- */
 module.exports = {
   up: async (queryInterface) => {
-    // Lấy danh sách vendor user_id hiện có trong DB
-    const [vendors] = await queryInterface.sequelize.query(`
-      SELECT u.user_id
-      FROM Users u
-      JOIN User_Roles ur ON ur.user_id = u.user_id
-      JOIN Roles r ON r.role_id = ur.role_id
-      WHERE r.role_name = 'vendor'
-      ORDER BY u.user_id ASC
-    `);
-
-    if (!vendors || vendors.length === 0) {
-      throw new Error(
-        "[Shops seeder] Không tìm thấy user có role 'vendor'. Hãy seed Roles, Users, User_Roles trước!"
-      );
-    }
-
-    // Helper chọn owner_id lần lượt từ danh sách vendors
-    const pickOwner = (i) => vendors[i % vendors.length].user_id;
-    const now = new Date();
-
-    // Chỉ để furniture/home-living; không còn electronics, pets, v.v.
-    const shops = [
+    await queryInterface.bulkInsert("Shops", [
       {
-        owner_id: pickOwner(0),
-        shop_name: "Nhà Xinh Furniture",
-        description: "Nội thất tinh gọn phong cách Japandi & Scandinavian.",
-        logo: "https://images.unsplash.com/photo-1616486886892-97dfc1593e96?q=80&w=400&auto=format&fit=crop",
+        owner_id: 6, // Vendor
+        shop_name: "Electronics Store",
+        description: "Specializing in high-end technology products",
+        logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG4TkxkFuXifNvLsDDaCB69Khm1LzrMFJLJA&s",
         banner:
-          "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.8,
-        followers: 5200,
-        total_products: 240,
-        views: 18500,
-        address: "90 Phạm Văn Đồng, TP. Hồ Chí Minh",
-        status: "active",
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        owner_id: pickOwner(1),
-        shop_name: "Scandi Living",
-        description:
-          "Sofa vải, bàn trà, kệ TV chuẩn Bắc Âu – tối giản và ấm áp.",
-        logo: "https://images.unsplash.com/photo-1617093727343-374698b1b08a?q=80&w=400&auto=format&fit=crop",
-        banner:
-          "https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.7,
-        followers: 3100,
-        total_products: 180,
-        views: 9700,
-        address: "123 Lê Lợi, Quận 1, TP. Hồ Chí Minh",
-        status: "active",
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        owner_id: pickOwner(2),
-        shop_name: "Bedroom Studio",
-        description: "Giường gỗ sồi, tủ áo cánh lùa, nệm foam hybrid.",
-        logo: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=400&auto=format&fit=crop",
-        banner:
-          "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d52?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.6,
-        followers: 2100,
-        total_products: 120,
-        views: 7800,
-        address: "78 Trần Hưng Đạo, Quận 5, TP. Hồ Chí Minh",
-        status: "active",
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        owner_id: pickOwner(3),
-        shop_name: "Dining Atelier",
-        description: "Bàn ăn gỗ tự nhiên & bộ ghế uốn cong ergonomic.",
-        logo: "https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=400&auto=format&fit=crop",
-        banner:
-          "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.5,
-        followers: 1800,
-        total_products: 95,
-        views: 6200,
-        address: "45 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh",
-        status: "active",
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        owner_id: pickOwner(4),
-        shop_name: "Lighting House",
-        description: "Đèn sàn, đèn bàn gốm, đèn thả – ánh sáng ấm áp.",
-        logo: "https://images.unsplash.com/photo-1473186505569-9c61870c11f9?q=80&w=400&auto=format&fit=crop",
-        banner:
-          "https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.6,
-        followers: 1500,
-        total_products: 130,
-        views: 7000,
-        address: "12 Võ Văn Kiệt, TP. Thủ Đức, TP. Hồ Chí Minh",
-        status: "active",
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        owner_id: pickOwner(5),
-        shop_name: "Office & Study",
-        description: "Bàn làm việc 120cm, ghế công thái học ErgoMesh.",
-        logo: "https://images.unsplash.com/photo-1505409859467-3a796fd5798e?q=80&w=400&auto=format&fit=crop",
-        banner:
-          "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.4,
-        followers: 1700,
-        total_products: 110,
-        views: 6400,
-        address: "87 Cách Mạng Tháng 8, Quận 3, TP. Hồ Chí Minh",
-        status: "active",
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        owner_id: pickOwner(6),
-        shop_name: "Outdoor Patio",
-        description: "Bàn ghế ngoài trời giả mây, gỗ teak chống thời tiết.",
-        logo: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=400&auto=format&fit=crop",
-        banner:
-          "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.5,
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 3.0,
         followers: 1200,
-        total_products: 90,
-        views: 5200,
-        address: "15 Tân Bình, Quận Tân Bình, TP. Hồ Chí Minh",
+        total_products: 200,
+        views: 5000,
+        address: "123 Le Loi Street, District 1, Ho Chi Minh City",
         status: "active",
-        created_at: now,
-        updated_at: now,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
-        owner_id: pickOwner(7),
-        shop_name: "Minimal Objects",
-        description: "Gương đứng viền kim loại, thảm Nordic, bình gốm.",
-        logo: "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=400&auto=format&fit=crop",
+        owner_id: 9, // Vendor
+        shop_name: "High-End Fashion",
+        description: "Specializing in clothing, shoes, and accessories",
+        logo: "https://s3-symbol-logo.tradingview.com/avt-natural-products--600.png",
         banner:
-          "https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop",
-        rating: 4.6,
-        followers: 1900,
-        total_products: 150,
-        views: 6100,
-        address: "22 Đồng Khởi, Quận 1, TP. Hồ Chí Minh",
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.8,
+        followers: 2500,
+        total_products: 350,
+        views: 7200,
+        address: "45 Nguyen Hue, District 1, Ho Chi Minh City",
         status: "active",
-        created_at: now,
-        updated_at: now,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
-    ];
-
-    await queryInterface.bulkInsert("Shops", shops);
+      {
+        owner_id: 13, // Vendor
+        shop_name: "ABC Bookstore",
+        description: "Specializing in books, stationery, and gifts",
+        logo: "https://th.bing.com/th/id/OIP.4V-SOe0yjOivytzOhuqw5gHaHa?rs=1&pid=ImgDetMain",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.6,
+        followers: 900,
+        total_products: 500,
+        views: 3200,
+        address: "78 Tran Hung Dao, District 5, Ho Chi Minh City",
+        status: "active",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 17, // Vendor
+        shop_name: "Furniture Store",
+        description: "Providing high-quality furniture",
+        logo: "https://th.bing.com/th/id/OIP.IlTS2EpbppkgqhbJgchZ0wHaHa?w=1280&h=1280&rs=1&pid=ImgDetMain",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.7,
+        followers: 1800,
+        total_products: 150,
+        views: 5400,
+        address: "90 Pham Van Dong, Ho Chi Minh City",
+        status: "inactive",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 9, // Vendor
+        shop_name: "Gourmet Delights",
+        description: "Providing high-quality food and beverages",
+        logo: "https://example.com/images/shop5-logo.jpg",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.9,
+        followers: 3200,
+        total_products: 280,
+        views: 8600,
+        address: "12 Vo Van Kiet, District 2, Ho Chi Minh City",
+        status: "inactive",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 7, // Vendor
+        shop_name: "Pet World",
+        description: "Everything your pet needs: food, toys, and accessories",
+        logo: "https://th.bing.com/th/id/OIP.r2L147Tk-C4ECjSGuuRPLgHaHa?rs=1&pid=ImgDetMain",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.5,
+        followers: 1100,
+        total_products: 220,
+        views: 4700,
+        address: "35 Ba Thang Hai, District 10, Ho Chi Minh City",
+        status: "active",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 7,
+        shop_name: "Sports & Fitness Gear",
+        description: "Premium quality sports and fitness equipment",
+        logo: "https://th.bing.com/th?id=OIF.0UYA%2baJfSzPNP%2bIe7O3FKA&rs=1&pid=ImgDetMain",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.6,
+        followers: 1600,
+        total_products: 310,
+        views: 6900,
+        address: "87 Cach Mang Thang 8, District 3, Ho Chi Minh City",
+        status: "active",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 5,
+        shop_name: "Luxury Jewelry",
+        description: "Fine jewelry and watches from top brands",
+        logo: "https://m.media-amazon.com/images/I/51q9f8GJkWL.jpg",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.9,
+        followers: 4300,
+        total_products: 125,
+        views: 9800,
+        address: "22 Dong Khoi, District 1, Ho Chi Minh City",
+        status: "suspended",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 10,
+        shop_name: "Auto Parts & Accessories",
+        description: "Car and motorcycle accessories for every model",
+        logo: "https://example.com/images/shop9-logo.jpg",
+        banner:
+          "https://static.vecteezy.com/system/resources/previews/026/787/170/non_2x/9-9-shopping-day-banner-design-with-3d-podium-vector.jpg",
+        rating: 4.3,
+        followers: 1400,
+        total_products: 270,
+        views: 6100,
+        address: "15 Tan Binh Street, Tan Binh District, Ho Chi Minh City",
+        status: "suspended",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 17, // Vendor
+        shop_name: "Musical Instruments Store",
+        description:
+          "Providing the best instruments and accessories for musicians",
+        logo: "https://example.com/images/shop10-logo.jpg",
+        banner: "https://example.com/images/shop10-banner.jpg",
+        rating: 4.7,
+        followers: 1700,
+        total_products: 200,
+        views: 5500,
+        address: "99 Nguyen Tri Phuong, District 5, Ho Chi Minh City",
+        status: "active",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        owner_id: 17, // Vendor
+        shop_name: "Musical Instruments Store 2",
+        description:
+          "Providing the best instruments and accessories for musicians",
+        logo: "https://example.com/images/shop10-logo.jpg",
+        banner: "https://example.com/images/shop10-banner.jpg",
+        rating: 4.7,
+        followers: 2000,
+        total_products: 210,
+        views: 550,
+        address: "99 Nguyen Tri Phuong, District 3, Ho Chi Minh City",
+        status: "active",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    ]);
   },
 
   down: async (queryInterface) => {

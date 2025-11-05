@@ -160,9 +160,9 @@ const handleGetShopRating = async (req, res) => {
   }
 };
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 const handleAIChat = async (req, res) => {
   try {
     const { message } = req.body;

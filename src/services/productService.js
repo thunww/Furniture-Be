@@ -313,8 +313,9 @@ class ProductService {
             INSERT INTO product_variants (
               product_id, price, stock, image_url
             ) VALUES (
-              ${newProduct.product_id}, ${parseFloat(price) || 0}, ${parseInt(stock, 10) || 0
-            }, 
+              ${newProduct.product_id}, ${parseFloat(price) || 0}, ${
+            parseInt(stock, 10) || 0
+          }, 
               ${defaultImageUrl_safe ? `'${defaultImageUrl_safe}'` : "NULL"}
             )
           `;
