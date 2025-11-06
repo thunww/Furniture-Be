@@ -1,9 +1,14 @@
-const { verifyToken } = require("../config/jwt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const authMiddleware = (req, res, next) => {
   try {
-    // Đọc token từ cookie
-    const token = req.cookies?.accessToken;
+    // 1️⃣ Lấy token từ cookie hoặc header
+    const token =
+      req.cookies?.accessToken ||
+      (req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : null);
 
     if (!token) {
       return res.status(401).json({
@@ -12,18 +17,29 @@ const authMiddleware = (req, res, next) => {
       });
     }
 
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
+    // 2️⃣ Xác thực token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      // Token hết hạn hoặc sai khóa → báo FE gọi refresh
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({
+          message: "Access token expired",
+          needRefresh: true,
+        });
+      }
       return res.status(401).json({
-        message: "Invalid or expired token",
-        needRefresh: true,
+        message: "Invalid token",
+        needLogin: true,
       });
     }
 
-    // Chuẩn hóa ID người dùng
+    // 3️⃣ Chuẩn hóa dữ liệu user — cho phép dùng cả id & user_id
     req.user = {
-      id: decoded.user_id || decoded.id,
+      ...decoded,
+      id: decoded.id || decoded.user_id,
+      user_id: decoded.user_id || decoded.id,
       email: decoded.email,
       roles: decoded.roles || [],
     };
@@ -31,9 +47,8 @@ const authMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     console.error("authMiddleware error:", error.message);
-    return res.status(401).json({
-      message: "Invalid token",
-      needRefresh: true,
+    return res.status(500).json({
+      message: "Internal authentication error",
     });
   }
 };

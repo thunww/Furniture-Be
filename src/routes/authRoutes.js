@@ -9,6 +9,7 @@ const {
   handleForgotPassword,
   handleResetPassword,
   handleLogout,
+  handleGetProfile,
 } = require("../controllers/authController");
 
 // Public routes
@@ -23,5 +24,6 @@ router.post("/refresh-token", handleRefreshToken);
 
 // Protected routes
 router.post("/logout", authMiddleware, handleLogout);
+router.get("/profile", authMiddleware, handleGetProfile);
 
 module.exports = router;

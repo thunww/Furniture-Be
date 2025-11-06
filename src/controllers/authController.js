@@ -6,10 +6,19 @@ const {
   logoutUser,
   forgotPassword,
   resetPassword,
+  getUserProfile,
 } = require("../services/authService");
 const { verifyToken } = require("../config/jwt");
 require("dotenv").config();
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  path: "/",
+};
+
+// ========================== REGISTER ==========================
 const handleregisterUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -33,6 +42,7 @@ const handleregisterUser = async (req, res) => {
   }
 };
 
+// ========================== LOGIN ==========================
 const handleLoginUser = async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
@@ -43,30 +53,21 @@ const handleLoginUser = async (req, res) => {
       rememberMe
     );
 
-    // Thời gian sống của cookie tùy thuộc vào rememberMe
     const accessTokenMaxAge = rememberMe
       ? 7 * 24 * 60 * 60 * 1000
-      : 2 * 60 * 60 * 1000; // 7 ngày hoặc 2 giờ
+      : 2 * 60 * 60 * 1000;
     const refreshTokenMaxAge = rememberMe
       ? 30 * 24 * 60 * 60 * 1000
-      : 7 * 24 * 60 * 60 * 1000; // 30 ngày hoặc 7 ngày
+      : 7 * 24 * 60 * 60 * 1000;
 
-    // Set access token cookie
     res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
+      ...cookieOptions,
       maxAge: accessTokenMaxAge,
-      path: "/",
     });
 
-    // Set refresh token cookie
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
+      ...cookieOptions,
       maxAge: refreshTokenMaxAge,
-      path: "/",
     });
 
     res.json({
@@ -78,7 +79,7 @@ const handleLoginUser = async (req, res) => {
   }
 };
 
-// Controller để refresh access token
+// ========================== REFRESH TOKEN ==========================
 const handleRefreshToken = async (req, res) => {
   try {
     const refreshToken = req.cookies?.refreshToken;
@@ -95,15 +96,21 @@ const handleRefreshToken = async (req, res) => {
       });
     }
 
-    const { accessToken, user } = await refreshAccessToken(refreshToken);
+    const {
+      accessToken,
+      refreshToken: newRefresh,
+      user,
+    } = await refreshAccessToken(refreshToken);
 
-    // Set access token mới vào cookie
     res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-      maxAge: 2 * 60 * 60 * 1000, // 2 giờ
-      path: "/",
+      ...cookieOptions,
+      maxAge: 2 * 60 * 60 * 1000,
+    });
+
+    // 👉 rotate refresh token (bảo mật hơn)
+    res.cookie("refreshToken", newRefresh, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({
@@ -113,20 +120,8 @@ const handleRefreshToken = async (req, res) => {
   } catch (error) {
     console.error("Refresh token error:", error.message);
 
-    // Nếu refresh token không hợp lệ, xóa cả 2 cookies
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-      path: "/",
-    });
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-      path: "/",
-    });
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
 
     return res.status(401).json({
       message: error.message,
@@ -135,6 +130,7 @@ const handleRefreshToken = async (req, res) => {
   }
 };
 
+// ========================== VERIFY EMAIL ==========================
 const verifyEmail = async (req, res) => {
   const { token } = req.query;
   if (!token) {
@@ -158,6 +154,7 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+// ========================== FORGOT PASSWORD ==========================
 const handleForgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -176,6 +173,7 @@ const handleForgotPassword = async (req, res) => {
   }
 };
 
+// ========================== RESET PASSWORD ==========================
 const handleResetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
@@ -200,29 +198,17 @@ const handleResetPassword = async (req, res) => {
   }
 };
 
+// ========================== LOGOUT ==========================
 const handleLogout = async (req, res) => {
   try {
     const userId = req.user?.id;
 
     if (userId) {
-      // Xóa refresh token khỏi database
       await logoutUser(userId);
     }
 
-    // Xóa cả 2 cookies
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-      path: "/",
-    });
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-      path: "/",
-    });
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
 
     return res.status(200).json({
       message: "Logout successful",
@@ -235,6 +221,28 @@ const handleLogout = async (req, res) => {
   }
 };
 
+// ========================== GET PROFILE ==========================
+const handleGetProfile = async (req, res) => {
+  try {
+    const accessToken = req.cookies?.accessToken;
+    if (!accessToken) {
+      return res.status(401).json({ message: "Unauthorized - No token" });
+    }
+
+    const profile = await getUserProfile(accessToken);
+
+    return res.status(200).json({
+      message: "Profile retrieved successfully",
+      user: profile,
+    });
+  } catch (error) {
+    console.error("Get profile error:", error.message);
+    return res.status(401).json({
+      message: error.message || "Failed to get profile",
+    });
+  }
+};
+
 module.exports = {
   handleregisterUser,
   handleLoginUser,
@@ -243,4 +251,5 @@ module.exports = {
   handleForgotPassword,
   handleResetPassword,
   handleLogout,
+  handleGetProfile,
 };
