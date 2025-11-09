@@ -97,8 +97,7 @@ class OrderController {
   }
   async getUserOrders(req, res) {
     try {
-      const user_id = req.user.user_id;
-
+      const user_id = req.user.id;
       const orders = await orderService.getUserOrders(user_id);
 
       res.status(200).json({

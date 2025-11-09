@@ -1,27 +1,30 @@
 const express = require("express");
-const {
-  handleLoginUser,
-  handleregisterUser,
-  verifyEmail,
-  handleForgotPassword,
-  handleResetPassword,
-  handleLogout,
-  handleRefreshToken,
-  handleGetProfile,
-} = require("../controllers/authController");
-
+const authController = require("../controllers/authController");
+const { loginLimiter } = require("../middleware/rateLimiter");
 const router = express.Router();
 
-// ---------- ROUTES ----------
-router.post("/register", handleregisterUser);
-router.post("/login", handleLoginUser);
-router.get("/verify-email", verifyEmail);
-router.post("/forgot-password", handleForgotPassword);
-router.post("/reset-password", handleResetPassword);
-router.post("/logout", handleLogout);
+// Register
+router.post("/register", authController.handleregisterUser);
 
-// ✅ Thêm route refresh token
-router.post("/refresh", handleRefreshToken);
-router.get("/profile", handleGetProfile);
+// Login - Có rate limiting
+router.post("/login", loginLimiter, authController.handleLoginUser);
+
+// Refresh token
+router.post("/refresh-token", authController.handleRefreshToken);
+
+// Logout
+router.post("/logout", authController.handleLogout);
+
+// Verify email
+router.get("/verify-email", authController.verifyEmail);
+
+// Forgot password
+router.post("/forgot-password", authController.handleForgotPassword);
+
+// Reset password
+router.post("/reset-password", authController.handleResetPassword);
+
+// Get profile
+router.get("/profile", authController.handleGetProfile);
 
 module.exports = router;
