@@ -45,12 +45,13 @@ const handleregisterUser = async (req, res) => {
 // ========================== LOGIN ==========================
 const handleLoginUser = async (req, res) => {
   try {
-    const { email, password, rememberMe } = req.body;
+    const { email, password, rememberMe, captchaToken } = req.body;
 
     const { accessToken, refreshToken, user } = await loginUser(
       email,
       password,
-      rememberMe
+      rememberMe,
+      captchaToken
     );
 
     const accessTokenMaxAge = rememberMe
@@ -75,7 +76,17 @@ const handleLoginUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Login error:", error.message);
+
+    // Xác định status code
+    const statusCode = error.isLocked ? 423 : 401; // 423 = Locked
+
+    return res.status(statusCode).json({
+      message: error.message,
+      needCaptcha: error.needCaptcha || false,
+      isLocked: error.isLocked || false,
+      attempts: error.attempts || 0,
+    });
   }
 };
 
@@ -107,7 +118,6 @@ const handleRefreshToken = async (req, res) => {
       maxAge: 2 * 60 * 60 * 1000,
     });
 
-    // 👉 rotate refresh token (bảo mật hơn)
     res.cookie("refreshToken", newRefresh, {
       ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -201,7 +211,7 @@ const handleResetPassword = async (req, res) => {
 // ========================== LOGOUT ==========================
 const handleLogout = async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.id || req.user?.user_id;
 
     if (userId) {
       await logoutUser(userId);

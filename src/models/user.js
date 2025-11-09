@@ -63,6 +63,20 @@ User.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    // ← THÊM 3 FIELDS BẢO MẬT
+    login_attempts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    locked_until: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    last_failed_login: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,

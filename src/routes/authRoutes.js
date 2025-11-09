@@ -1,29 +1,30 @@
 const express = require("express");
+const authController = require("../controllers/authController");
+const { loginLimiter } = require("../middleware/rateLimiter");
 const router = express.Router();
-const authMiddleware = require("../middleware/authMiddleware");
-const {
-  handleregisterUser,
-  handleLoginUser,
-  handleRefreshToken,
-  verifyEmail,
-  handleForgotPassword,
-  handleResetPassword,
-  handleLogout,
-  handleGetProfile,
-} = require("../controllers/authController");
 
-// Public routes
-router.post("/register", handleregisterUser);
-router.post("/login", handleLoginUser);
-router.get("/verify-email", verifyEmail);
-router.post("/forgot-password", handleForgotPassword);
-router.post("/reset-password", handleResetPassword);
+// Register
+router.post("/register", authController.handleregisterUser);
 
-// Route để refresh token (không cần authMiddleware)
-router.post("/refresh-token", handleRefreshToken);
+// Login - Có rate limiting
+router.post("/login", loginLimiter, authController.handleLoginUser);
 
-// Protected routes
-router.post("/logout", authMiddleware, handleLogout);
-router.get("/profile", authMiddleware, handleGetProfile);
+// Refresh token
+router.post("/refresh-token", authController.handleRefreshToken);
+
+// Logout
+router.post("/logout", authController.handleLogout);
+
+// Verify email
+router.get("/verify-email", authController.verifyEmail);
+
+// Forgot password
+router.post("/forgot-password", authController.handleForgotPassword);
+
+// Reset password
+router.post("/reset-password", authController.handleResetPassword);
+
+// Get profile
+router.get("/profile", authController.handleGetProfile);
 
 module.exports = router;

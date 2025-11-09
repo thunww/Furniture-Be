@@ -58,6 +58,20 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      // ← THÊM 3 FIELDS BẢO MẬT
+      login_attempts: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      locked_until: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      last_failed_login: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
