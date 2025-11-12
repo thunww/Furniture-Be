@@ -3,13 +3,12 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const compression = require("compression");
 const cookieParser = require("cookie-parser");
-const passport = require("passport");
 const http = require("http");
 
 // Config imports
 const { sequelize } = require("./models");
 const configCORS = require("./config/cors");
-require("./config/passport");
+// require("./config/passport"); // ← XÓA DÒNG NÀY (không cần passport cho Google OAuth)
 
 // Routes imports
 const authRoutes = require("./routes/authRoutes");
@@ -53,7 +52,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // PASSPORT AUTHENTICATION
-app.use(passport.initialize());
+// app.use(passport.initialize()); // ← XÓA HOẶC COMMENT DÒNG NÀY (không cần passport)
 
 // STATIC FILES
 app.use("/uploads", express.static("uploads"));

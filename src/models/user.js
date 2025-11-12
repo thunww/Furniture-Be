@@ -25,7 +25,7 @@ User.init(
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true, // ← ĐỔI THÀNH TRUE
     },
     email: {
       type: DataTypes.STRING(100),
@@ -63,7 +63,6 @@ User.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    // ← THÊM 3 FIELDS BẢO MẬT
     login_attempts: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
@@ -76,6 +75,17 @@ User.init(
     last_failed_login: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    // ← THÊM 2 FIELDS GOOGLE OAUTH
+    google_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      unique: true,
+    },
+    auth_provider: {
+      type: DataTypes.ENUM("local", "google"),
+      allowNull: false,
+      defaultValue: "local",
     },
   },
   {

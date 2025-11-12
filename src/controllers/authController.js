@@ -2,6 +2,7 @@ const User = require("../models/user");
 const {
   registerUser,
   loginUser,
+  loginWithGoogle, // ← THÊM
   refreshAccessToken,
   logoutUser,
   forgotPassword,
@@ -26,18 +27,13 @@ const handleregisterUser = async (req, res) => {
     const result = await registerUser(username, email, password);
 
     return res.status(201).json({
-      message:
-        "User registration successful. Please check your email for verification.",
-      user: {
-        user_id: result.user_id,
-        username: result.username,
-        email: result.email,
-        role: result.role,
-      },
+      message: result.message || "User registration successful.",
+      user: result.user || null,
     });
   } catch (error) {
+    console.error(" Lỗi đăng ký:", error.message);
     return res.status(400).json({
-      message: error.message,
+      message: error.message || "Đăng ký thất bại, vui lòng thử lại.",
     });
   }
 };
@@ -86,6 +82,44 @@ const handleLoginUser = async (req, res) => {
       needCaptcha: error.needCaptcha || false,
       isLocked: error.isLocked || false,
       attempts: error.attempts || 0,
+    });
+  }
+};
+
+// ========================== GOOGLE LOGIN ==========================
+const handleGoogleLogin = async (req, res) => {
+  try {
+    const { googleToken } = req.body;
+
+    if (!googleToken) {
+      return res.status(400).json({
+        message: "Google token is required",
+      });
+    }
+
+    const { accessToken, refreshToken, user } = await loginWithGoogle(
+      googleToken
+    );
+
+    // Set cookies với thời gian dài hơn cho Google login
+    res.cookie("accessToken", accessToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 ngày
+    });
+
+    return res.status(200).json({
+      message: "Google login successful",
+      user,
+    });
+  } catch (error) {
+    console.error("Google login error:", error.message);
+    return res.status(401).json({
+      message: error.message,
     });
   }
 };
@@ -256,6 +290,7 @@ const handleGetProfile = async (req, res) => {
 module.exports = {
   handleregisterUser,
   handleLoginUser,
+  handleGoogleLogin,
   handleRefreshToken,
   verifyEmail,
   handleForgotPassword,
