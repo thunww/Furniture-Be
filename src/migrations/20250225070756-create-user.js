@@ -21,7 +21,7 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING(255),
-        allowNull: true,
+        allowNull: true, // ← ĐỔI THÀNH TRUE cho Google login
       },
       email: {
         type: Sequelize.STRING(100),
@@ -58,7 +58,7 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      // ← THÊM 3 FIELDS BẢO MẬT
+      // Security fields
       login_attempts: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -71,6 +71,17 @@ module.exports = {
       last_failed_login: {
         type: Sequelize.DATE,
         allowNull: true,
+      },
+      // ← GOOGLE OAUTH FIELDS
+      google_id: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+        unique: true,
+      },
+      auth_provider: {
+        type: Sequelize.ENUM("local", "google"),
+        allowNull: false,
+        defaultValue: "local",
       },
       created_at: {
         type: Sequelize.DATE,

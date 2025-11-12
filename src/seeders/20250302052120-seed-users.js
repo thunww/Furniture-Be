@@ -22,6 +22,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -43,6 +45,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -64,6 +68,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -85,6 +91,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -106,6 +114,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -127,6 +137,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -148,6 +160,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -169,6 +183,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -189,6 +205,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -209,6 +227,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -230,6 +250,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -251,6 +273,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -272,6 +296,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -292,6 +318,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -312,6 +340,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -332,6 +362,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -352,6 +384,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -372,6 +406,8 @@ module.exports = {
         login_attempts: 0,
         locked_until: null,
         last_failed_login: null,
+        google_id: null, // ← THÊM
+        auth_provider: "local", // ← THÊM
         created_at: new Date(),
         updated_at: new Date(),
       },

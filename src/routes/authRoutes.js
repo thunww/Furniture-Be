@@ -9,6 +9,9 @@ router.post("/register", authController.handleregisterUser);
 // Login - Có rate limiting
 router.post("/login", loginLimiter, authController.handleLoginUser);
 
+// ← THÊM ROUTE GOOGLE LOGIN
+router.post("/google", authController.handleGoogleLogin);
+
 // Refresh token
 router.post("/refresh-token", authController.handleRefreshToken);
 
