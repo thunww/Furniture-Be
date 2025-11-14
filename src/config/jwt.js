@@ -3,16 +3,17 @@ const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
 const EXPIRES_IN = process.env.JWT_EXPIRES_IN || "2h"; // access token mặc định 2h
 
-// Tạo token (access hoặc refresh)
+// Tạo token
 const generateToken = (payload, expiresIn = EXPIRES_IN) => {
   return jwt.sign(payload, SECRET_KEY, { expiresIn });
 };
 
-// Giải mã token
+// Xác thực token, có log lỗi
 const verifyToken = (token) => {
   try {
     return jwt.verify(token, SECRET_KEY);
   } catch (error) {
+    console.error("JWT verify error:", error.name, "-", error.message);
     return null;
   }
 };
