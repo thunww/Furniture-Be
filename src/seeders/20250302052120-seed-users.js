@@ -1,17 +1,15 @@
-const bcrypt = require("bcrypt");
+"use strict";
+const { hashPassword } = require("../utils/hashPassword");
 
 module.exports = {
   up: async (queryInterface) => {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash("password123", saltRounds);
-    const adminPassword = await bcrypt.hash("admin", saltRounds);
-    await queryInterface.bulkInsert("Users", [
+    const users = [
       {
         user_id: 1,
         first_name: "John",
         last_name: "Doe",
         username: "johndoe",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "johndoe@example.com",
         phone: "123456789",
         gender: "male",
@@ -26,7 +24,7 @@ module.exports = {
         first_name: "Jane",
         last_name: "Smith",
         username: "janesmith",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "janesmith@example.com",
         phone: "987654321",
         gender: "female",
@@ -41,7 +39,7 @@ module.exports = {
         first_name: "Admin",
         last_name: "User",
         username: "admin",
-        password: adminPassword,
+        password: await hashPassword("admin"),
         email: "admin@example.com",
         phone: "000000000",
         gender: "male",
@@ -56,7 +54,7 @@ module.exports = {
         first_name: "Alice",
         last_name: "Brown",
         username: "alicebrown",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "alice@example.com",
         phone: "111111111",
         gender: "female",
@@ -71,7 +69,7 @@ module.exports = {
         first_name: "Bob",
         last_name: "Johnson",
         username: "bobjohnson",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "bob@example.com",
         phone: "222222222",
         gender: "male",
@@ -86,7 +84,7 @@ module.exports = {
         first_name: "Charlie",
         last_name: "Davis",
         username: "charliedavis",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "charlie@example.com",
         phone: "333333333",
         gender: "male",
@@ -101,7 +99,7 @@ module.exports = {
         first_name: "David",
         last_name: "Miller",
         username: "davidmiller",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "david@example.com",
         phone: "444444444",
         gender: "male",
@@ -116,7 +114,7 @@ module.exports = {
         first_name: "Emma",
         last_name: "Wilson",
         username: "emmawilson",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "emma@example.com",
         phone: "555555555",
         gender: "female",
@@ -131,7 +129,7 @@ module.exports = {
         first_name: "Frank",
         last_name: "Clark",
         username: "frankclark",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "frank@example.com",
         phone: "666666666",
         gender: "male",
@@ -145,7 +143,7 @@ module.exports = {
         first_name: "Grace",
         last_name: "Lee",
         username: "gracelee",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "grace@example.com",
         phone: "777777777",
         gender: "female",
@@ -159,7 +157,7 @@ module.exports = {
         first_name: "Henry",
         last_name: "White",
         username: "henrywhite",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "henry@example.com",
         phone: "888888888",
         gender: "male",
@@ -174,7 +172,7 @@ module.exports = {
         first_name: "Ivy",
         last_name: "Harris",
         username: "ivyharris",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "ivy@example.com",
         phone: "999999999",
         gender: "female",
@@ -189,7 +187,7 @@ module.exports = {
         first_name: "Jack",
         last_name: "Anderson",
         username: "jackanderson",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "jack@example.com",
         phone: "101010101",
         gender: "male",
@@ -204,7 +202,7 @@ module.exports = {
         first_name: "Kevin",
         last_name: "Scott",
         username: "kevinscott",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "kevin@example.com",
         phone: "141414141",
         gender: "male",
@@ -218,7 +216,7 @@ module.exports = {
         first_name: "Laura",
         last_name: "Young",
         username: "laurayoung",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "laura@example.com",
         phone: "151515151",
         gender: "female",
@@ -232,7 +230,7 @@ module.exports = {
         first_name: "Michael",
         last_name: "King",
         username: "michaelking",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "michael@example.com",
         phone: "161616161",
         gender: "male",
@@ -246,7 +244,7 @@ module.exports = {
         first_name: "Nancy",
         last_name: "Evans",
         username: "nancyevans",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "nancy@example.com",
         phone: "171717171",
         gender: "female",
@@ -260,7 +258,7 @@ module.exports = {
         first_name: "Oscar",
         last_name: "Green",
         username: "oscargreen",
-        password: hashedPassword,
+        password: await hashPassword("password123"),
         email: "oscar@example.com",
         phone: "181818181",
         gender: "male",
@@ -269,9 +267,10 @@ module.exports = {
         profile_picture: null,
         is_verified: true,
       },
-    ]);
-  },
+    ];
 
+    await queryInterface.bulkInsert("Users", users, {});
+  },
   down: async (queryInterface) => {
     await queryInterface.bulkDelete("Users", null, {});
   },

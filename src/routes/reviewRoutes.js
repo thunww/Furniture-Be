@@ -24,6 +24,7 @@ router.post(
   "/products/:id",
   upload.single("image"),
   reviewController.createReview
+
 );
 
 // Cập nhật nội dung đánh giá (rating, comment, images)

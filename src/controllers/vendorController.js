@@ -452,7 +452,7 @@ const handleGetSubordersWithOrderItemsPaginated = async (req, res) => {
   }
 };
 
-const handleUpdateProduct = async (req, res) => {
+const handleUpdateProduct = async (req, res, next) => {
   try {
     const userId = req.user.user_id;
     const { product_id } = req.params;
@@ -518,28 +518,8 @@ const handleUpdateProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in handleUpdateProduct:", error);
+    return next(error); // để handleProductError xử lý ảnh + response
 
-    // Xử lý các loại lỗi cụ thể
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Dữ liệu không hợp lệ",
-        errors: error.errors,
-      });
-    }
-
-    if (error.name === "NotFoundError") {
-      return res.status(404).json({
-        success: false,
-        message: "Không tìm thấy sản phẩm hoặc biến thể",
-      });
-    }
-
-    // Trả về lỗi mặc định
-    res.status(500).json({
-      success: false,
-      message: error.message || "Lỗi khi cập nhật sản phẩm",
-    });
   }
 };
 
@@ -560,7 +540,7 @@ const handleDeleteVariant = async (req, res) => {
   }
 };
 
-const handleCreateProduct = async (req, res) => {
+const handleCreateProduct = async (req, res,next) => {
   try {
     const userId = req.user.user_id;
     let {
@@ -626,26 +606,12 @@ const handleCreateProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in handleCreateProduct:", error);
-
-    // Xử lý các loại lỗi cụ thể
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Dữ liệu không hợp lệ",
-        errors: error.errors,
-      });
-    }
-
-    // Trả về lỗi mặc định
-    res.status(500).json({
-      success: false,
-      message: error.message || "Lỗi khi tạo sản phẩm",
-    });
+    return next(error); // để handleProductError xử lý ảnh + response
   }
 };
 
 // Đăng ký trở thành vendor
-const handleRegisterVendor = async (req, res) => {
+const handleRegisterVendor = async (req, res,next) => {
   try {
     const userId = req.user.user_id;
     const { shopName, description, address } = req.body;
@@ -680,6 +646,7 @@ const handleRegisterVendor = async (req, res) => {
       success: false,
       message: error.message || "Đăng ký thất bại. Vui lòng thử lại!",
     });
+    return next(error); // để handleProductError xử lý ảnh + response
   }
 };
 // Hàm xử lí doanh thu các tháng theo năm

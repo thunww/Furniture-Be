@@ -19,6 +19,7 @@ const moment = require("moment-timezone");
 const Sequelize = require("sequelize");
 const { fn, col } = require("sequelize");
 
+
 // Lấy shop theo user ID
 const getShopByUserId = async (userId) => {
   try {
@@ -2386,6 +2387,7 @@ const createProduct = async (userId, productData, variants) => {
   } catch (error) {
     console.error("Error in vendorService.createProduct:", error);
     throw error;
+    
   }
 };
 

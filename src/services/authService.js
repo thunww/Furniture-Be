@@ -49,53 +49,68 @@ const registerUser = async (username, email, password) => {
   };
 };
 
-const loginUser = async (email, password) => {
+const loginUser = async (email, password, rememberMe = false) => {
   const user = await User.findOne({ where: { email } });
-  if (!user) {
-    throw new Error("Email does not exist!");
-  }
+
+  // Luôn trả lỗi chung nếu email không tồn tại hoặc mật khẩu sai
+  if (!user) throw new Error("Email hoặc mật khẩu không chính xác");
 
   const isMatch = await comparePassword(password, user.password);
-  if (!isMatch) {
-    throw new Error("Incorrect password!");
-  }
+  if (!isMatch) throw new Error("Email hoặc mật khẩu không chính xác");
 
-  if (user.status == "banned") {
-    throw new Error("User account banned");
-  }
+  // Cấm login nếu bị khóa hoặc chưa xác minh
+  if (user.status === "banned") throw new Error("Tài khoản đã bị khóa");
+  if (!user.is_verified)
+    throw new Error("Vui lòng xác minh email trước khi đăng nhập");
 
-  if (!user.is_verified) {
-    throw new Error("Please verify your email first!");
-  }
-
+  // Lấy roles
   const userRoles = await UserRole.findAll({
     where: { user_id: user.user_id },
   });
-  if (userRoles.length === 0) {
-    throw new Error("User has no assigned role!");
-  }
-
   const roleIds = userRoles.map((ur) => ur.role_id);
   const roles = await Role.findAll({ where: { role_id: roleIds } });
+  const roleNames = roles.map((r) => r.role_name);
 
-  const roleNames = roles.map((role) => role.role_name);
+  // Tạo Access Token (2h)
+  const accessToken = generateToken(
+    { user_id: user.user_id, email: user.email, roles: roleNames },
+    "2h"
+  );
 
-  const token = generateToken({
-    user_id: user.user_id,
-    email: user.email,
-    roles: roleNames,
-  });
+  // Tạo Refresh Token (7 hoặc 30 ngày)
+  const refreshExpiresIn = rememberMe ? "30d" : "7d";
+  const refreshToken = generateToken(
+    { user_id: user.user_id, email: user.email },
+    refreshExpiresIn
+  );
 
   return {
-    message: "Login successful",
-    token,
+    message: "Đăng nhập thành công",
+    accessToken,
+    refreshToken,
     user: {
       user_id: user.user_id,
       email: user.email,
-      roles: roleNames, // Trả về danh sách role thay vì 1 role
-      status: user.status,
+      roles: roleNames,
     },
   };
+};
+
+// ✅ Làm mới token
+const refreshAccessToken = async (refreshToken) => {
+  const decoded = verifyToken(refreshToken);
+  if (!decoded) throw new Error("Invalid or expired refresh token");
+
+  // Tạo token mới
+  const newAccessToken = generateToken(
+    {
+      user_id: decoded.user_id,
+      email: decoded.email,
+    },
+    "2h"
+  );
+
+  return newAccessToken;
 };
 
 const forgotPassword = async (email) => {
@@ -131,4 +146,10 @@ const resetPassword = async (token, newPassword) => {
   return "Password has been successfully changed";
 };
 
-module.exports = { registerUser, loginUser, forgotPassword, resetPassword };
+module.exports = {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  resetPassword,
+  refreshAccessToken,
+};

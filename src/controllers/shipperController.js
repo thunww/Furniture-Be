@@ -897,6 +897,11 @@ exports.completeOrder = async (req, res) => {
           model: Payment,
           as: "payments",
           required: false
+        },
+        {
+          model: Order,
+          as: "Order",
+          required: true
         }
       ],
       transaction: t,
@@ -938,6 +943,20 @@ exports.completeOrder = async (req, res) => {
         {
           transaction: t,
           fields: ["status", "paid_at"],
+        }
+      );
+    }
+
+    // Cập nhật payment_status của Order thành paid
+    if (subOrder.Order) {
+      console.log("Updating Order payment_status to paid");
+      await subOrder.Order.update(
+        {
+          payment_status: "paid"
+        },
+        {
+          transaction: t,
+          fields: ["payment_status"],
         }
       );
     }
