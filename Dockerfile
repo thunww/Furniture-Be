@@ -1,25 +1,15 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install build tools and Python for bcrypt
-RUN apk add --no-cache python3 build-base
-ENV PYTHON=/usr/bin/python3
-
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy source code
+# Copy toàn bộ project
 COPY . .
 
-COPY .env.docker .env
+# Expose port
+EXPOSE 5000
 
-# Create uploads directory
-RUN mkdir -p uploads
-ENV DB_HOST=mysql
-
-
-CMD ["npm", "start"] 
+# Chạy file server.js trong thư mục src
+CMD ["node", "src/server.js"]
